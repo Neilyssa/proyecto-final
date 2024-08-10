@@ -1,0 +1,507 @@
+package gestionAlmacen;
+
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.border.EmptyBorder;
+import java.awt.Font;
+import java.awt.Color;
+import javax.swing.SwingConstants;
+
+public class Inicio extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JPasswordField JpassClave;
+    private JTextField textUsuario;
+    private JButton btnIngresar;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Inicio frame = new Inicio();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public Inicio() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 450, 300);
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(128, 128, 192));
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+
+        JLabel lblLogin = new JLabel("Login");
+        lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
+        lblLogin.setFont(new Font("Tahoma", Font.BOLD, 18));
+        lblLogin.setBounds(145, 0, 128, 30);
+        contentPane.add(lblLogin);
+
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setFont(new Font("Tahoma", Font.BOLD, 12));
+        lblUsuario.setBounds(20, 65, 67, 14);
+        contentPane.add(lblUsuario);
+
+        JLabel lblContraseña = new JLabel("Contraseña:");
+        lblContraseña.setFont(new Font("Tahoma", Font.BOLD, 11));
+        lblContraseña.setBounds(10, 117, 87, 14);
+        contentPane.add(lblContraseña);
+
+        JpassClave = new JPasswordField();
+        JpassClave.setBounds(97, 114, 181, 20);
+        contentPane.add(JpassClave);
+
+        textUsuario = new JTextField();
+        textUsuario.setBounds(97, 62, 176, 20);
+        contentPane.add(textUsuario);
+        textUsuario.setColumns(10);
+
+        JButton btnRegistrarse = new JButton("Registrarse");
+        btnRegistrarse.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Registro p = new Registro();
+                p.setVisible(true);
+            }
+        });
+        btnRegistrarse.setFont(new Font("Tahoma", Font.BOLD, 11));
+        btnRegistrarse.setBounds(277, 175, 89, 23);
+        contentPane.add(btnRegistrarse);
+
+        btnIngresar = new JButton("Ingresar");
+        btnIngresar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String usuario = textUsuario.getText();
+                char[] Clave = JpassClave.getPassword();
+                String Contra = new String(Clave);
+
+                if (validarUsuario(usuario, Contra)) {
+                    dispose();
+                    JOptionPane.showMessageDialog(null, "Bienvenido", "Ingresaste", JOptionPane.INFORMATION_MESSAGE);
+                    Principal a = new Principal();
+                    a.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Usuario o Contraseña incorrecto", "Intente de nuevo", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnIngresar.setFont(new Font("Tahoma", Font.BOLD, 11));
+        btnIngresar.setBounds(81, 175, 89, 23);
+        contentPane.add(btnIngresar);
+    }
+
+    private boolean validarUsuario(String usuario, String contraseña) {
+        boolean esValido = false;
+        try (Connection con = ConecionBD.getConnection();
+             PreparedStatement pst = con.prepareStatement("SELECT * FROM usuarios WHERE username = ? AND password = ?")) {
+            pst.setString(1, usuario);
+            pst.setString(2, contraseña);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                esValido = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return esValido;
+    }
+}
+package gestionAlmacen;
+
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import java.awt.Font;
+import java.awt.Color;
+
+public class Principal extends JFrame {
+
+	  private static final long serialVersionUID = 1L;
+	    private JPanel contentPane;
+
+	    public static void main(String[] args) {
+	        EventQueue.invokeLater(new Runnable() {
+	            public void run() {
+	                try {
+	                    Principal frame = new Principal();
+	                    frame.setVisible(true);
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        });
+	    }
+
+	    public Principal() {
+	        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        setBounds(100, 100, 450, 300);
+	        contentPane = new JPanel();
+	        contentPane.setBackground(new Color(128, 128, 192));
+	        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+	        setContentPane(contentPane);
+	        contentPane.setLayout(null);
+
+	        JButton btnUsuarios = new JButton("Usuarios");
+	        btnUsuarios.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	                // Abre la ventana de gestión de usuarios
+	                GestionUsuarios ventanaUsuarios = new GestionUsuarios();
+	                ventanaUsuarios.setVisible(true);
+	            }
+	        });
+	        btnUsuarios.setIcon(new ImageIcon(Principal.class.getResource("/resources/Usuario(1).png")));
+	        btnUsuarios.setBounds(48, 55, 115, 115);
+	        contentPane.add(btnUsuarios);
+
+	        JButton btnProductos = new JButton("Productos");
+	        btnProductos.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	                // Abre la ventana de gestión de productos
+	                GestionProductos ventanaProductos = new GestionProductos();
+	                ventanaProductos.setVisible(true);
+	            }
+	        });
+	        btnProductos.setIcon(new ImageIcon(Principal.class.getResource("/resources/producto2.png")));
+	        btnProductos.setBounds(238, 55, 115, 115);
+	        contentPane.add(btnProductos);
+
+	        JLabel lblUsuarios = new JLabel("Usuarios");
+	        lblUsuarios.setFont(new Font("Tahoma", Font.BOLD, 14));
+	        lblUsuarios.setBounds(69, 181, 75, 14);
+	        contentPane.add(lblUsuarios);
+
+	        JLabel lblProductos = new JLabel("Productos");
+	        lblProductos.setFont(new Font("Tahoma", Font.BOLD, 14));
+	        lblProductos.setBounds(261, 181, 80, 14);
+	        contentPane.add(lblProductos);
+	    }
+	
+}
+	package gestionAlmacen;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.SwingConstants;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JButton;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class Registro extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField textUsuario2;
+	private JTextField textNombre;
+	private JTextField textField;
+	private JTextField textTelefono;
+	private JTextField textCorreo;
+	private JPasswordField passwordField;
+	private JPasswordField passwordField_1;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Registro frame = new Registro();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public Registro() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBackground(new Color(128, 128, 192));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JLabel lblRegistro = new JLabel("Pagina de Registro");
+		lblRegistro.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRegistro.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblRegistro.setBounds(114, 11, 175, 19);
+		contentPane.add(lblRegistro);
+		
+		JLabel lblUsuario2 = new JLabel("Usuario: ");
+		lblUsuario2.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblUsuario2.setBounds(10, 55, 49, 14);
+		contentPane.add(lblUsuario2);
+		
+		textUsuario2 = new JTextField();
+		textUsuario2.setBounds(64, 52, 115, 20);
+		contentPane.add(textUsuario2);
+		textUsuario2.setColumns(10);
+		
+		JLabel lblNombre = new JLabel("Nombre:");
+		lblNombre.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNombre.setBounds(10, 100, 49, 14);
+		contentPane.add(lblNombre);
+		
+		textNombre = new JTextField();
+		textNombre.setBounds(64, 97, 115, 20);
+		contentPane.add(textNombre);
+		textNombre.setColumns(10);
+		
+		JLabel lblApellido = new JLabel("Apellido:");
+		lblApellido.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblApellido.setBounds(10, 144, 49, 14);
+		contentPane.add(lblApellido);
+		
+		textField = new JTextField();
+		textField.setBounds(64, 141, 115, 20);
+		contentPane.add(textField);
+		textField.setColumns(10);
+		
+		JLabel lblTelefono = new JLabel("Telefono:");
+		lblTelefono.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblTelefono.setBounds(10, 183, 59, 14);
+		contentPane.add(lblTelefono);
+		
+		textTelefono = new JTextField();
+		textTelefono.setBounds(64, 180, 115, 20);
+		contentPane.add(textTelefono);
+		textTelefono.setColumns(10);
+		
+		JLabel lblCorreo = new JLabel("Correo:");
+		lblCorreo.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblCorreo.setBounds(190, 55, 46, 14);
+		contentPane.add(lblCorreo);
+		
+		textCorreo = new JTextField();
+		textCorreo.setBounds(236, 52, 122, 20);
+		contentPane.add(textCorreo);
+		textCorreo.setColumns(10);
+		
+		JLabel lblContraseña2 = new JLabel("Contraseña:");
+		lblContraseña2.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblContraseña2.setBounds(189, 100, 68, 14);
+		contentPane.add(lblContraseña2);
+		
+		passwordField = new JPasswordField();
+		passwordField.setBounds(260, 97, 115, 20);
+		contentPane.add(passwordField);
+		
+		JLabel lblConfcontraseña = new JLabel("Confirmar \r\nContraseña:");
+		lblConfcontraseña.setLabelFor(this);
+		lblConfcontraseña.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblConfcontraseña.setBounds(189, 144, 136, 14);
+		contentPane.add(lblConfcontraseña);
+		
+		passwordField_1 = new JPasswordField();
+		passwordField_1.setBounds(318, 141, 106, 20);
+		contentPane.add(passwordField_1);
+		
+		JButton btnRegistrarse2 = new JButton("Registrarse");
+		btnRegistrarse2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				dispose();
+				Principal a = new Principal();
+				a.setVisible(true);
+				
+			}
+		});
+		btnRegistrarse2.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnRegistrarse2.setBounds(157, 227, 99, 23);
+		contentPane.add(btnRegistrarse2);
+		
+		JButton btnCancelar = new JButton("Cancelar");
+		btnCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				dispose();
+				
+			}
+		});
+		btnCancelar.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnCancelar.setBounds(301, 227, 89, 23);
+		contentPane.add(btnCancelar);
+	}
+
+}
+package gestionAlmacen;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+
+public class ConecionBD {
+
+
+	private static final String URL = "jdbc:mysql://localhost:3306/login"; 
+    private static final String USER = "root";
+    private static final String PASSWORD = "123456";
+
+    public static Connection getConnection() throws SQLException {
+        System.out.println("Intentando conectar a la base de datos...");
+        Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        System.out.println("Conexión exitosa.");
+        return connection;
+    }
+	    
+	    }
+	  package gestionAlmacen;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class Main {
+
+	  public static void main(String[] args) {
+	        try {
+	            // Obtener la conexión utilizando la clase ConecionBD
+	            Connection conn = ConecionBD.getConnection();
+	            if (conn != null) {
+	                System.out.println("Conexión exitosa.");
+	            } else {
+	                System.out.println("Conexión fallida.");
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	            System.out.println("Error al conectar a la base de datos.");
+	        }
+	    }
+}
+  package gestionAlmacen;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import java.awt.Font;
+import javax.swing.SwingConstants;
+public class GestionUsuarios extends JFrame {
+
+	
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JTable tableUsuarios;
+
+    public GestionUsuarios() {
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setBounds(100, 100, 600, 400);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(new BorderLayout());
+
+        JLabel lblUsuarios = new JLabel("Gestión de Usuarios");
+        lblUsuarios.setHorizontalAlignment(SwingConstants.CENTER);
+        lblUsuarios.setFont(new Font("Tahoma", Font.BOLD, 16));
+        contentPane.add(lblUsuarios, BorderLayout.NORTH);
+
+        tableUsuarios = new JTable();
+        JScrollPane scrollPane = new JScrollPane(tableUsuarios);
+        contentPane.add(scrollPane, BorderLayout.CENTER);
+
+        JButton btnAgregarUsuario = new JButton("Agregar Usuario");
+        btnAgregarUsuario.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Implementa la lógica para agregar un usuario
+            }
+        });
+        contentPane.add(btnAgregarUsuario, BorderLayout.SOUTH);
+    }
+	
+}
+package gestionAlmacen;
+
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import java.awt.Font;
+import javax.swing.SwingConstants;
+
+public class GestionProductos extends JFrame {
+
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JTable tableProductos;
+
+    public GestionProductos() {
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setBounds(100, 100, 600, 400);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(new BorderLayout());
+
+        JLabel lblProductos = new JLabel("Gestión de Productos");
+        lblProductos.setHorizontalAlignment(SwingConstants.CENTER);
+        lblProductos.setFont(new Font("Tahoma", Font.BOLD, 16));
+        contentPane.add(lblProductos, BorderLayout.NORTH);
+
+        tableProductos = new JTable();
+        JScrollPane scrollPane = new JScrollPane(tableProductos);
+        contentPane.add(scrollPane, BorderLayout.CENTER);
+
+        JButton btnAgregarProducto = new JButton("Agregar Producto");
+        btnAgregarProducto.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Implementa la lógica para agregar un producto
+            }
+        });
+        contentPane.add(btnAgregarProducto, BorderLayout.SOUTH);
+    }
+}
